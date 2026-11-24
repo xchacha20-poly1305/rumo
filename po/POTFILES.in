@@ -1,0 +1,5 @@
+schemas/org.gnome.shell.extensions.rumo.gschema.xml
+src/platform/oskManager.ts
+src/ui/candidateDrawer.ts
+src/ui/keyButton.ts
+src/ui/symbolPickerView.ts

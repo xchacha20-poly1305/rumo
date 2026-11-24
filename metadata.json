@@ -1,0 +1,10 @@
+{
+  "uuid": "rumo@io.github.xchacha20-poly1305",
+  "name": "Rumo — 如梦输入法",
+  "description": "Mobile-style GNOME Wayland on-screen keyboard replacement backed by Fcitx5 InputContext1 D-Bus.",
+  "version": 1,
+  "settings-schema": "org.gnome.shell.extensions.rumo",
+  "gettext-domain": "rumo",
+  "shell-version": ["51"],
+  "url": "https://github.com/xchacha20-poly1305/rumo"
+}

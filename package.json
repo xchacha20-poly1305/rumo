@@ -1,0 +1,18 @@
+{
+  "name": "rumo",
+  "version": "0.1.0",
+  "description": "Rumo (如梦输入法) — A mobile-style GNOME Wayland OSK backed by Fcitx5 InputContext1 D-Bus",
+  "type": "module",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "bun run build.ts",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "install-ext": "bun run build.ts --install",
+    "pot": "xgettext --from-code=UTF-8 --package-name=rumo --package-version=0.1.0 --copyright-holder=\"Rumo Contributors\" -o po/rumo.pot schemas/org.gnome.shell.extensions.rumo.gschema.xml && xgettext --from-code=UTF-8 --join-existing -L JavaScript --keyword=_ --keyword=N_ --keyword=C_:1c,2 -o po/rumo.pot $(grep -v '\\.gschema\\.xml$' po/POTFILES.in)"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.8.0"
+  }
+}

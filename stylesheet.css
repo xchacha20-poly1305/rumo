@@ -1,0 +1,352 @@
+/* Rumo (如梦输入法) — Mobile-style OSK Theme */
+
+.rumo-keyboard {
+  background-color: rgba(24, 25, 29, 0.96);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 12px 10px 12px;
+  spacing: 6px;
+}
+
+.rumo-candidate-bar {
+  spacing: 4px;
+  padding: 0 2px 4px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rumo-preedit-strip {
+  padding: 0 8px;
+  spacing: 6px;
+}
+
+.rumo-preedit-label {
+  color: #8ec5ff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.rumo-candidate-row {
+  spacing: 8px;
+  min-height: 40px;
+}
+
+.rumo-candidate-list {
+  spacing: 0;
+  padding: 0;
+}
+
+.rumo-cand-sep {
+  width: 1px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.rumo-candidate-btn {
+  background-color: transparent;
+  color: #f2f4f8;
+  border-radius: 8px;
+  padding: 4px 10px;
+  min-height: 36px;
+  font-size: 18px;
+  font-weight: 500;
+  transition-duration: 80ms;
+}
+
+.rumo-candidate-btn:hover,
+.rumo-candidate-btn:active {
+  background-color: rgba(98, 160, 234, 0.28);
+}
+
+.rumo-candidate-btn-primary {
+  background-color: rgba(53, 132, 228, 0.24);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.rumo-status-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  padding: 0 8px;
+}
+
+.rumo-bar-action-btn {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #e8ebf2;
+  border-radius: 9px;
+  padding: 4px 12px;
+  min-width: 44px;
+  min-height: 36px;
+  font-size: 18px;
+  font-weight: 600;
+  transition-duration: 80ms;
+}
+
+.rumo-bar-action-btn:hover,
+.rumo-bar-action-btn:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.rumo-bar-action-btn-active {
+  background-color: rgba(53, 132, 228, 0.42);
+  color: #ffffff;
+}
+
+.rumo-bar-action-btn:insensitive {
+  color: rgba(255, 255, 255, 0.22);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Expanded all-candidates drawer (flex-wrap rows + right sidebar) */
+.rumo-drawer {
+  spacing: 8px;
+  padding-top: 2px;
+}
+
+.rumo-drawer-scroll {
+  padding-right: 4px;
+}
+
+.rumo-drawer-grid {
+  spacing: 2px;
+}
+
+.rumo-drawer-row {
+  spacing: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rumo-drawer-cand-btn {
+  background-color: transparent;
+  color: #f0f2f6;
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-height: 38px;
+  font-size: 16px;
+  font-weight: 400;
+  transition-duration: 70ms;
+}
+
+.rumo-drawer-cand-btn:hover,
+.rumo-drawer-cand-btn:active {
+  background-color: rgba(98, 160, 234, 0.32);
+  color: #ffffff;
+}
+
+.rumo-drawer-cand-btn-primary {
+  color: #8ec5ff;
+  font-weight: 600;
+}
+
+.rumo-drawer-more-btn {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-top: 4px;
+  min-height: 34px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rumo-drawer-more-btn:hover,
+.rumo-drawer-more-btn:active {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.rumo-drawer-sidebar {
+  width: 72px;
+  spacing: 6px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rumo-drawer-side-btn {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #e4e8f0;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  min-height: 38px;
+  transition-duration: 80ms;
+}
+
+.rumo-drawer-side-btn:hover,
+.rumo-drawer-side-btn:active {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.rumo-drawer-back-btn {
+  background-color: #3584e4;
+  color: #ffffff;
+}
+
+.rumo-drawer-back-btn:hover,
+.rumo-drawer-back-btn:active {
+  background-color: #4a96f0;
+}
+
+/* Main key grid */
+.rumo-key-grid {
+  spacing: 7px;
+  padding-top: 2px;
+}
+
+.rumo-key-row {
+  spacing: 6px;
+}
+
+.rumo-key {
+  background-color: rgba(58, 61, 70, 0.96);
+  color: #ffffff;
+  border-radius: 10px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.38);
+  font-size: 18px;
+  font-weight: 500;
+  padding: 4px;
+  transition-duration: 70ms;
+}
+
+.rumo-key:hover {
+  background-color: rgba(74, 78, 90, 0.98);
+}
+
+.rumo-key:active,
+.rumo-key-pressed {
+  background-color: rgba(98, 160, 234, 0.72);
+  color: #ffffff;
+}
+
+.rumo-key-special {
+  background-color: rgba(42, 44, 52, 0.96);
+  color: #d7dce6;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rumo-key-accent {
+  background-color: #3584e4;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.rumo-key-accent:hover,
+.rumo-key-accent:active {
+  background-color: #4a96f0;
+}
+
+.rumo-key-active {
+  background-color: rgba(53, 132, 228, 0.42);
+  color: #ffffff;
+  border: 1px solid rgba(120, 180, 255, 0.65);
+}
+
+.rumo-key-space {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.rumo-key-alt-fg {
+  background-color: rgba(58, 61, 70, 0.96);
+  color: #b8c0d0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rumo-key-numpad-digit {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.rumo-key-icon {
+  icon-size: 20px;
+}
+
+.rumo-key-main-label {
+  font-size: 18px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.rumo-key-secondary-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(215, 220, 230, 0.52);
+  padding: 2px 5px 0 0;
+}
+
+.rumo-key-secondary-active .rumo-key-secondary-label {
+  color: #8ec5ff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Symbol picker tabs & grid */
+.rumo-symbol-tabs {
+  spacing: 4px;
+  padding: 0 2px;
+}
+
+.rumo-symbol-tab {
+  background-color: transparent;
+  color: rgba(232, 235, 242, 0.55);
+  border-radius: 8px;
+  padding: 4px 6px;
+  min-height: 34px;
+  font-size: 14px;
+  font-weight: 600;
+  transition-duration: 70ms;
+}
+
+.rumo-symbol-tab:hover,
+.rumo-symbol-tab:active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.rumo-symbol-tab-active {
+  background-color: rgba(53, 132, 228, 0.34);
+  color: #ffffff;
+  border-bottom: 2px solid #62a0ea;
+}
+
+.rumo-symbol-tab-icon {
+  icon-size: 18px;
+}
+
+.rumo-symbol-picker {
+  spacing: 4px;
+  padding-top: 2px;
+}
+
+.rumo-symbol-grid {
+  spacing: 6px;
+}
+
+.rumo-symbol-row {
+  spacing: 6px;
+}
+
+.rumo-symbol-key {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.rumo-symbol-empty-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+}
+
+.rumo-pagination-track {
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  margin: 1px 0;
+}
+
+.rumo-pagination-thumb {
+  height: 3px;
+  background-color: #62a0ea;
+  border-radius: 2px;
+}

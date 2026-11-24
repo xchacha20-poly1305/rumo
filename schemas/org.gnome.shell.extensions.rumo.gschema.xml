@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="rumo">
+  <schema id="org.gnome.shell.extensions.rumo" path="/org/gnome/shell/extensions/rumo/">
+    <key name="xwayland-clipboard-fallback" type="b">
+      <default>true</default>
+      <summary>Enable XWayland clipboard paste fallback</summary>
+      <description>When the focused window has no Wayland text-input context and non-ASCII text is committed, temporarily paste via clipboard and restore previous clipboard contents.</description>
+    </key>
+    <key name="keyboard-height-ratio" type="d">
+      <default>0.34</default>
+      <summary>Keyboard height ratio relative to monitor height</summary>
+      <description>Height of the on-screen keyboard as a fraction of the active monitor height.</description>
+    </key>
+    <key name="show-panel-indicator" type="b">
+      <default>true</default>
+      <summary>Show top bar toggle indicator</summary>
+      <description>Show a keyboard toggle button in the GNOME Shell top bar.</description>
+    </key>
+    <key name="recent-symbols" type="as">
+      <default>[]</default>
+      <summary>Recently used symbols</summary>
+      <description>Ordered list of recently used symbols in the symbol picker (most recent first).</description>
+    </key>
+  </schema>
+</schemalist>
