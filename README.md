@@ -4,6 +4,42 @@ Rumo 在 GNOME 下提供接近原生移动端输入法的体验。
 
 命名为谐音：Ru == "如"，mo == “梦”。同时也致敬了 rime。
 
+# 安装
+
+目前尚未发布到 GNOME Extensions，需从源码构建并安装。
+
+## 环境要求
+
+- GNOME Shell 51（Wayland）
+- 运行中的 [Fcitx5](https://fcitx-im.org/)（通过 `InputContext1` D-Bus 接口通信）
+- 构建工具：[Bun](https://bun.sh/)、`glib-compile-schemas`（GLib）、`msgfmt`（gettext）
+
+## 从源码安装
+
+```bash
+git clone https://github.com/xchacha20-poly1305/rumo.git
+cd rumo
+bun install
+bun run install-ext
+```
+
+`bun run install-ext` 会编译扩展并将文件安装到 `~/.local/share/gnome-shell/extensions/rumo@io.github.xchacha20-poly1305`。
+
+安装完成后，**注销并重新登录**（Wayland 下需重新登录以重新加载 GNOME Shell），然后启用扩展：
+
+```bash
+gnome-extensions enable rumo@io.github.xchacha20-poly1305
+```
+
+也可以在「扩展（Extensions）」或 Extension Manager 应用中手动启用。
+
+## 卸载
+
+```bash
+gnome-extensions disable rumo@io.github.xchacha20-poly1305
+rm -rf ~/.local/share/gnome-shell/extensions/rumo@io.github.xchacha20-poly1305
+```
+
 # 致谢
 
 体验、设计以及布局参考了 [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android)。
