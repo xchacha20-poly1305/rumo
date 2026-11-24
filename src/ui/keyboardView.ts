@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { getLayout } from '../core/layouts.js';
+import type { AppliedThemeState } from '../core/themeTypes.js';
 import type {
   CandidateDrawerState,
   ClientSideUIState,
@@ -32,6 +33,8 @@ export interface KeyboardViewCallbacks {
 
 export class KeyboardView {
   readonly actor: any;
+  private readonly _bgLayer: any;
+  private readonly _contentBox: any;
   private readonly _candidateBar: CandidateBar;
   private readonly _candidateDrawer: CandidateDrawer;
   private readonly _symbolPickerView: SymbolPickerView;
@@ -53,14 +56,36 @@ export class KeyboardView {
     extensionPath: string,
   ) {
     this._extensionPath = extensionPath;
-    this.actor = new St.BoxLayout({
+    this.actor = new St.Widget({
+      layout_manager: new Clutter.BinLayout(),
       style_class: 'rumo-keyboard',
-      orientation: Clutter.Orientation.VERTICAL,
       reactive: true,
       can_focus: false,
       x_expand: true,
       y_expand: true,
     });
+
+    this._bgLayer = new St.Widget({
+      style_class: 'rumo-keyboard-bg',
+      x_expand: true,
+      y_expand: true,
+      x_align: Clutter.ActorAlign.FILL,
+      y_align: Clutter.ActorAlign.FILL,
+      visible: false,
+      can_focus: false,
+    });
+    this.actor.add_child(this._bgLayer);
+
+    this._contentBox = new St.BoxLayout({
+      style_class: 'rumo-keyboard-content',
+      orientation: Clutter.Orientation.VERTICAL,
+      x_expand: true,
+      y_expand: true,
+      x_align: Clutter.ActorAlign.FILL,
+      y_align: Clutter.ActorAlign.FILL,
+      can_focus: false,
+    });
+    this.actor.add_child(this._contentBox);
 
     this._candidateBar = new CandidateBar(
       {
@@ -75,7 +100,7 @@ export class KeyboardView {
       },
       extensionPath,
     );
-    this.actor.add_child(this._candidateBar.actor);
+    this._contentBox.add_child(this._candidateBar.actor);
 
     this._candidateDrawer = new CandidateDrawer({
       onSelectCandidate: (pageIndex, indexInPage) =>
@@ -84,7 +109,7 @@ export class KeyboardView {
       onBackspace: () => this._callbacks.onKeyAction({ type: 'backspace' }),
       onClose: () => this._callbacks.onCloseDrawer(),
     });
-    this.actor.add_child(this._candidateDrawer.actor);
+    this._contentBox.add_child(this._candidateDrawer.actor);
 
     this._symbolPickerView = new SymbolPickerView(
       {
@@ -94,7 +119,7 @@ export class KeyboardView {
       },
       extensionPath,
     );
-    this.actor.add_child(this._symbolPickerView.actor);
+    this._contentBox.add_child(this._symbolPickerView.actor);
 
     this._keyGrid = new St.BoxLayout({
       style_class: 'rumo-key-grid',
@@ -103,9 +128,33 @@ export class KeyboardView {
       y_expand: true,
       can_focus: false,
     });
-    this.actor.add_child(this._keyGrid);
+    this._contentBox.add_child(this._keyGrid);
 
     this.renderLayout('qwerty-lower', 'off');
+  }
+
+  applyThemeState(state: AppliedThemeState): void {
+    if (state.mode === 'dark') {
+      this.actor.add_style_class_name('rumo-mode-dark');
+      this.actor.remove_style_class_name('rumo-mode-light');
+    } else {
+      this.actor.add_style_class_name('rumo-mode-light');
+      this.actor.remove_style_class_name('rumo-mode-dark');
+    }
+
+    if (state.keyBorder) {
+      this.actor.remove_style_class_name('rumo-borderless');
+    } else {
+      this.actor.add_style_class_name('rumo-borderless');
+    }
+
+    if (state.hasBackgroundImage) {
+      this.actor.add_style_class_name('rumo-has-bg-image');
+      this._bgLayer.show();
+    } else {
+      this.actor.remove_style_class_name('rumo-has-bg-image');
+      this._bgLayer.hide();
+    }
   }
 
   setDimensions(width: number, height: number): void {

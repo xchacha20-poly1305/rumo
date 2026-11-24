@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rumo Theme Configuration",
+  "description": "Configuration schema for Rumo (~/.config/rumo/theme.json, theme-light.json, theme-dark.json).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema reference."
+    },
+    "extends": {
+      "type": "string",
+      "enum": ["dark", "light", "amoled", "flat-dark", "flat-light"],
+      "description": "Built-in base preset to inherit from. Defaults to the active GNOME color scheme ('dark' or 'light')."
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Key shape and border styling.",
+      "properties": {
+        "keyRadius": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 24,
+          "description": "Key corner radius in pixels (0..24)."
+        },
+        "keyBorder": {
+          "type": "boolean",
+          "description": "Whether keys render a raised bottom border (true) or flat borderless style (false)."
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Font family and scaling.",
+      "properties": {
+        "fontFamily": {
+          "type": ["string", "null"],
+          "description": "Comma-separated font family list (e.g. 'Inter, Noto Sans CJK SC'), or null for system default."
+        },
+        "fontScale": {
+          "type": "number",
+          "minimum": 0.75,
+          "maximum": 1.4,
+          "description": "Multiplier applied to label font sizes and icon sizes (0.75..1.4)."
+        }
+      }
+    },
+    "background": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional keyboard background image and readability scrim.",
+      "properties": {
+        "image": {
+          "type": ["string", "null"],
+          "description": "Image path (relative to ~/.config/rumo/, ~/..., or absolute), or null to disable."
+        },
+        "size": {
+          "type": "string",
+          "enum": ["cover", "contain"],
+          "description": "How the background image is fitted."
+        },
+        "dim": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.95,
+          "description": "Overlay scrim opacity over the background image (0..0.95)."
+        }
+      }
+    },
+    "colors": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Color tokens (hex #rgb/#rgba/#rrggbb/#rrggbbaa, rgb(), rgba(), or transparent). Unspecified secondary tokens derive automatically.",
+      "properties": {
+        "accent": {
+          "type": "string",
+          "description": "Primary accent color, or 'system' to follow GNOME accent color."
+        },
+        "accentForeground": {
+          "type": "string",
+          "description": "Text/icon color on accent surfaces, or 'auto' for contrast selection."
+        },
+        "keyboardBackground": { "type": "string", "description": "Keyboard container background." },
+        "keyboardBorder": { "type": "string", "description": "Top border color of keyboard container." },
+        "backgroundScrim": { "type": "string", "description": "Explicit scrim color over background image (overrides background.dim)." },
+        "keyBackground": { "type": "string", "description": "Standard keycap background." },
+        "keyForeground": { "type": "string", "description": "Standard keycap label color." },
+        "keyHoverBackground": { "type": "string", "description": "Standard keycap hover background." },
+        "keyPressedBackground": { "type": "string", "description": "Keycap pressed background." },
+        "keyPressedForeground": { "type": "string", "description": "Keycap pressed text color." },
+        "keyBorderColor": { "type": "string", "description": "Bottom keycap shadow border color when keyBorder is true." },
+        "specialKeyBackground": { "type": "string", "description": "Modifier/function key background (Shift, Backspace, ?123, etc.)." },
+        "specialKeyForeground": { "type": "string", "description": "Modifier/function key text/icon color." },
+        "activeKeyBackground": { "type": "string", "description": "Active toggle key background (Shift active, IM active)." },
+        "activeKeyBorder": { "type": "string", "description": "Active toggle key border color." },
+        "altKeyBackground": { "type": "string", "description": "Alt-foreground key background (e.g. numpad secondary actions)." },
+        "altKeyForeground": { "type": "string", "description": "Alt-foreground key label color." },
+        "spaceForeground": { "type": "string", "description": "Spacebar label color." },
+        "secondaryLabelForeground": { "type": "string", "description": "Corner secondary character label color." },
+        "secondaryLabelActiveForeground": { "type": "string", "description": "Corner secondary label color when swipe-up/long-press is armed." },
+        "candidateBarBackground": { "type": "string", "description": "Candidate bar background." },
+        "candidateForeground": { "type": "string", "description": "Candidate text color." },
+        "candidatePrimaryBackground": { "type": "string", "description": "Highlighted primary candidate background." },
+        "candidatePrimaryForeground": { "type": "string", "description": "Highlighted primary candidate text color." },
+        "candidateHoverBackground": { "type": "string", "description": "Hovered/active candidate background." },
+        "preeditForeground": { "type": "string", "description": "Preedit composition text color." },
+        "statusForeground": { "type": "string", "description": "Idle status indicator text color." },
+        "divider": { "type": "string", "description": "Candidate bar divider color." },
+        "separator": { "type": "string", "description": "Vertical separator between candidates." },
+        "barActionBackground": { "type": "string", "description": "Candidate bar action button background." },
+        "barActionForeground": { "type": "string", "description": "Candidate bar action button foreground." },
+        "barActionActiveBackground": { "type": "string", "description": "Expanded drawer toggle button active background." },
+        "drawerRowBorder": { "type": "string", "description": "Row divider border inside candidate drawer." },
+        "drawerSidebarBorder": { "type": "string", "description": "Left border of candidate drawer sidebar." },
+        "drawerSideButtonBackground": { "type": "string", "description": "Candidate drawer sidebar button background." },
+        "paginationTrack": { "type": "string", "description": "Symbol picker pagination track color." },
+        "paginationThumb": { "type": "string", "description": "Symbol picker pagination thumb color." }
+      }
+    }
+  }
+}

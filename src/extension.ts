@@ -5,6 +5,7 @@ import { Fcitx5Client } from './platform/fcitx5Client.js';
 import { FocusTracker } from './platform/focusTracker.js';
 import { OskManager } from './platform/oskManager.js';
 import { TextInjector } from './platform/textInjector.js';
+import { ThemeManager } from './platform/themeManager.js';
 import { KeyboardView } from './ui/keyboardView.js';
 
 export default class RumoExtension extends Extension {
@@ -14,6 +15,7 @@ export default class RumoExtension extends Extension {
   private _injector: TextInjector | null = null;
   private _focusTracker: FocusTracker | null = null;
   private _view: KeyboardView | null = null;
+  private _themeManager: ThemeManager | null = null;
   private _router: InputRouter | null = null;
   private _oskManager: OskManager | null = null;
 
@@ -66,6 +68,10 @@ export default class RumoExtension extends Extension {
       },
       this.path,
     );
+
+    this._themeManager = new ThemeManager({
+      onThemeApplied: (state) => this._view?.applyThemeState(state),
+    });
 
     routerRef = new InputRouter(
       this._fcitx,
@@ -131,6 +137,9 @@ export default class RumoExtension extends Extension {
 
     this._focusTracker?.destroy();
     this._focusTracker = null;
+
+    this._themeManager?.destroy();
+    this._themeManager = null;
 
     this._view?.destroy();
     this._view = null;

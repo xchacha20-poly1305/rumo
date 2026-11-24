@@ -3,8 +3,17 @@
 .rumo-keyboard {
   background-color: rgba(24, 25, 29, 0.96);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+}
+
+.rumo-keyboard-bg {
+  background-image: none;
+}
+
+.rumo-keyboard-content {
   padding: 6px 12px 10px 12px;
   spacing: 6px;
+  background-color: transparent;
 }
 
 .rumo-candidate-bar {
@@ -94,6 +103,10 @@
 .rumo-bar-action-btn:insensitive {
   color: rgba(255, 255, 255, 0.22);
   background-color: rgba(255, 255, 255, 0.03);
+}
+
+.rumo-hide-icon {
+  icon-size: 20px;
 }
 
 /* Expanded all-candidates drawer (flex-wrap rows + right sidebar) */

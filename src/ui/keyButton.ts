@@ -63,7 +63,6 @@ export class KeyButton {
       const gicon = Gio.icon_new_for_string(iconPath);
       buttonProps.child = new St.Icon({
         gicon,
-        icon_size: 20,
         style_class: 'rumo-key-icon',
       });
     } else if (spec.secondaryLabel) {

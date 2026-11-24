@@ -135,7 +135,6 @@ export class CandidateBar {
     const gicon = Gio.icon_new_for_string(iconPath);
     const icon = new St.Icon({
       gicon,
-      icon_size: 20,
       style_class: 'rumo-hide-icon',
     });
     const btn = new St.Button({
@@ -216,7 +215,6 @@ export class CandidateBar {
         const gicon = Gio.icon_new_for_string(iconPath);
         props.child = new St.Icon({
           gicon,
-          icon_size: 18,
           style_class: 'rumo-symbol-tab-icon',
         });
       } else {
