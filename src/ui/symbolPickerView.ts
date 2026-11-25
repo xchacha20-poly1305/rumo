@@ -5,6 +5,7 @@ import St from 'gi://St';
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { makeSymbolPickerBottomRow } from '../core/layouts.js';
+import { computeKeyboardLayoutMetrics } from '../core/layoutMetrics.js';
 import type { KeyAction, KeySpec, SymbolPickerState } from '../core/types.js';
 import { KeyButton } from './keyButton.js';
 
@@ -28,6 +29,7 @@ export class SymbolPickerView {
 
   private _width = 1024;
   private _height = 320;
+  private _fontScale = 1;
   private _lastState: SymbolPickerState | null = null;
   private _imeActive = true;
 
@@ -107,6 +109,11 @@ export class SymbolPickerView {
   setDimensions(width: number, height: number): void {
     this._width = width;
     this._height = height;
+    this._applySizing();
+  }
+
+  setFontScale(scale: number): void {
+    this._fontScale = Number.isFinite(scale) ? scale : 1;
     this._applySizing();
   }
 
@@ -350,8 +357,8 @@ export class SymbolPickerView {
     const bsWidth = Math.max(28, Math.floor(bsUnit * 1.5));
 
     // Align bottom row height with 1 row of the 4-row grid layouts
-    const approxGridArea = Math.max(160, this._height - 76);
-    const rowHeight = Math.max(36, Math.floor((approxGridArea - 3 * 7) / 4));
+    const metrics = computeKeyboardLayoutMetrics(this._height, this._fontScale, 4);
+    const rowHeight = metrics.rowHeight;
     this._bottomRow.set_height(rowHeight);
 
     // 3 symbol rows
@@ -413,7 +420,7 @@ export class SymbolPickerView {
       const bottomChildren = this._bottomRow.get_children();
       bottomChildren.forEach((child: any, colIdx: number) => {
         const weight = this._bottomSpecs[colIdx]?.width ?? 1;
-        child.set_width(Math.max(28, Math.floor(unitWidth * weight)));
+        child.set_size(Math.max(28, Math.floor(unitWidth * weight)), rowHeight);
       });
     }
   }

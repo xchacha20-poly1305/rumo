@@ -2,6 +2,9 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 
+import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
+
+import type { DisplayMode } from '../core/settings.js';
 import type { ClientSideUIState, SymbolPickerState } from '../core/types.js';
 
 export interface CandidateBarCallbacks {
@@ -12,15 +15,22 @@ export interface CandidateBarCallbacks {
   onSelectSymbolCategory(index: number): void;
   onSymbolPrevPage(): void;
   onSymbolNextPage(): void;
+  onToggleDisplayMode(): void;
+  onOpenSettings(): void;
   onHide(): void;
 }
 
 export class CandidateBar {
   readonly actor: any;
 
-  private readonly _preeditStrip: any;
-  private readonly _preeditLabel: any;
   private readonly _candidateRow: any;
+  private readonly _toolbarToggleBtn: any;
+  private readonly _toolbarToggleIcon: any;
+  private readonly _toolbarBox: any;
+  private readonly _displayModeBtn: any;
+  private readonly _displayModeIcon: any;
+  private readonly _displayModeLabel: any;
+  private readonly _settingsBtn: any;
   private readonly _candidateList: any;
   private readonly _symbolTabsBox: any;
   private readonly _statusLabel: any;
@@ -29,11 +39,17 @@ export class CandidateBar {
   private readonly _expandBtn: any;
   private readonly _hideBtn: any;
 
+  private readonly _chevronRightIcon: any;
+  private readonly _chevronLeftIcon: any;
+  private readonly _overlayIcon: any;
+  private readonly _pushIcon: any;
+
   private _imStatusText = 'Rumo · 中';
+  private _displayMode: DisplayMode = 'overlay';
+  private _toolbarOpen = false;
   private _drawerOpen = false;
   private _symbolMode = false;
   private _hasCandidates = false;
-  private _hasPreedit = false;
   private _lastHasPrev = false;
   private _lastHasNext = false;
 
@@ -41,33 +57,120 @@ export class CandidateBar {
     private readonly _callbacks: CandidateBarCallbacks,
     private readonly _extensionPath: string,
   ) {
+    this._chevronRightIcon = Gio.icon_new_for_string(
+      `${this._extensionPath}/icons/chevron-right-symbolic.svg`,
+    );
+    this._chevronLeftIcon = Gio.icon_new_for_string(
+      `${this._extensionPath}/icons/chevron-left-symbolic.svg`,
+    );
+    this._overlayIcon = Gio.icon_new_for_string(
+      `${this._extensionPath}/icons/display-overlay-symbolic.svg`,
+    );
+    this._pushIcon = Gio.icon_new_for_string(
+      `${this._extensionPath}/icons/display-push-symbolic.svg`,
+    );
+
     this.actor = new St.BoxLayout({
       style_class: 'rumo-candidate-bar',
       orientation: Clutter.Orientation.VERTICAL,
       x_expand: true,
+      y_expand: false,
       reactive: true,
       can_focus: false,
     });
 
-    this._preeditStrip = new St.BoxLayout({
-      style_class: 'rumo-preedit-strip',
-      x_expand: true,
-      visible: false,
-      can_focus: false,
-    });
-    this._preeditLabel = new St.Label({
-      style_class: 'rumo-preedit-label',
-      text: '',
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    this._preeditStrip.add_child(this._preeditLabel);
-    this.actor.add_child(this._preeditStrip);
-
     this._candidateRow = new St.BoxLayout({
       style_class: 'rumo-candidate-row',
       x_expand: true,
+      y_expand: false,
       can_focus: false,
     });
+
+    this._toolbarToggleIcon = new St.Icon({
+      gicon: this._chevronRightIcon,
+      style_class: 'rumo-toolbar-icon',
+    });
+    this._toolbarToggleBtn = new St.Button({
+      child: this._toolbarToggleIcon,
+      style_class: 'rumo-bar-action-btn rumo-toolbar-toggle-btn',
+      can_focus: false,
+      reactive: true,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._toolbarToggleBtn.connect('clicked', () => {
+      this._toolbarOpen = !this._toolbarOpen;
+      this._syncToolbarVisibility();
+    });
+
+    this._toolbarBox = new St.BoxLayout({
+      style_class: 'rumo-toolbar-box',
+      x_expand: true,
+      visible: false,
+      y_align: Clutter.ActorAlign.CENTER,
+      can_focus: false,
+    });
+
+    this._displayModeIcon = new St.Icon({
+      gicon: this._overlayIcon,
+      style_class: 'rumo-toolbar-icon',
+    });
+    this._displayModeLabel = new St.Label({
+      text: _('Overlay'),
+      style_class: 'rumo-toolbar-label',
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    const displayModeContent = new St.BoxLayout({
+      style_class: 'rumo-toolbar-btn-content',
+      y_align: Clutter.ActorAlign.CENTER,
+      can_focus: false,
+    });
+    displayModeContent.add_child(this._displayModeIcon);
+    displayModeContent.add_child(this._displayModeLabel);
+
+    this._displayModeBtn = new St.Button({
+      child: displayModeContent,
+      style_class: 'rumo-bar-action-btn rumo-toolbar-btn',
+      can_focus: false,
+      reactive: true,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._displayModeBtn.connect('clicked', () => {
+      this._callbacks.onToggleDisplayMode();
+    });
+
+    const settingsIcon = new St.Icon({
+      gicon: Gio.icon_new_for_string(
+        `${this._extensionPath}/icons/settings-symbolic.svg`,
+      ),
+      style_class: 'rumo-toolbar-icon',
+    });
+    const settingsLabel = new St.Label({
+      text: _('Settings'),
+      style_class: 'rumo-toolbar-label',
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    const settingsContent = new St.BoxLayout({
+      style_class: 'rumo-toolbar-btn-content',
+      y_align: Clutter.ActorAlign.CENTER,
+      can_focus: false,
+    });
+    settingsContent.add_child(settingsIcon);
+    settingsContent.add_child(settingsLabel);
+
+    this._settingsBtn = new St.Button({
+      child: settingsContent,
+      style_class: 'rumo-bar-action-btn rumo-toolbar-btn',
+      can_focus: false,
+      reactive: true,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._settingsBtn.connect('clicked', () => {
+      this.collapseToolbar();
+      this._callbacks.onOpenSettings();
+    });
+
+    this._toolbarBox.add_child(this._displayModeBtn);
+    this._toolbarBox.add_child(this._settingsBtn);
 
     this._candidateList = new St.BoxLayout({
       style_class: 'rumo-candidate-list',
@@ -91,6 +194,9 @@ export class CandidateBar {
       y_align: Clutter.ActorAlign.CENTER,
     });
     this._candidateList.add_child(this._statusLabel);
+
+    this._candidateRow.add_child(this._toolbarToggleBtn);
+    this._candidateRow.add_child(this._toolbarBox);
     this._candidateRow.add_child(this._candidateList);
     this._candidateRow.add_child(this._symbolTabsBox);
 
@@ -128,6 +234,9 @@ export class CandidateBar {
     this._candidateRow.add_child(this._hideBtn);
 
     this.actor.add_child(this._candidateRow);
+
+    this._syncDisplayModeButton();
+    this._syncToolbarVisibility();
   }
 
   private _makeHideButton(onPress: () => void): any {
@@ -160,6 +269,22 @@ export class CandidateBar {
     return btn;
   }
 
+  setDisplayMode(mode: DisplayMode): void {
+    this._displayMode = mode;
+    this._syncDisplayModeButton();
+  }
+
+  collapseToolbar(): void {
+    if (!this._toolbarOpen) return;
+    this._toolbarOpen = false;
+    this._syncToolbarVisibility();
+  }
+
+  setBarHeights(candidateBarHeight: number, candidateRowHeight: number): void {
+    this.actor.set_height(candidateBarHeight);
+    this._candidateRow.set_height(candidateRowHeight);
+  }
+
   setIMStatus(_imeActive: boolean, label: string): void {
     this._imStatusText = `Rumo · ${label}`;
     if (this._statusLabel.get_parent() === this._candidateList) {
@@ -170,24 +295,15 @@ export class CandidateBar {
   setSymbolPickerMode(active: boolean, state?: SymbolPickerState): void {
     this._symbolMode = active;
     if (active) {
-      this._preeditStrip.hide();
-      this._candidateList.hide();
-      this._expandBtn.hide();
-      this._symbolTabsBox.show();
+      this._toolbarOpen = false;
+      this._syncToolbarVisibility();
       if (state) {
         this.updateSymbolPickerTabs(state);
       }
       return;
     }
 
-    this._symbolTabsBox.hide();
-    this._candidateList.show();
-    this._expandBtn.show();
-    if (this._hasPreedit) {
-      this._preeditStrip.show();
-    } else {
-      this._preeditStrip.hide();
-    }
+    this._syncToolbarVisibility();
     this._setNavEnabled(this._prevBtn, this._lastHasPrev);
     this._setNavEnabled(this._nextBtn, this._lastHasNext);
     this._syncExpandBtn();
@@ -235,16 +351,6 @@ export class CandidateBar {
   }
 
   updateUI(state: ClientSideUIState): void {
-    this._hasPreedit = state.preeditText.length > 0;
-    this._preeditLabel.text = state.preeditText;
-    if (!this._symbolMode) {
-      if (this._hasPreedit) {
-        this._preeditStrip.show();
-      } else {
-        this._preeditStrip.hide();
-      }
-    }
-
     this._candidateList.remove_all_children();
 
     if (state.candidates.length === 0) {
@@ -285,6 +391,7 @@ export class CandidateBar {
     this._hasCandidates = state.candidates.length > 0;
     this._lastHasPrev = state.hasPrev;
     this._lastHasNext = state.hasNext;
+    this._syncToolbarVisibility();
     if (!this._symbolMode) {
       this._setNavEnabled(this._prevBtn, state.hasPrev);
       this._setNavEnabled(this._nextBtn, state.hasNext);
@@ -295,6 +402,56 @@ export class CandidateBar {
   setDrawerOpen(open: boolean): void {
     this._drawerOpen = open;
     this._syncExpandBtn();
+  }
+
+  private _syncDisplayModeButton(): void {
+    if (this._displayMode === 'push') {
+      this._displayModeIcon.gicon = this._pushIcon;
+      this._displayModeLabel.text = _('Push screen');
+      this._displayModeBtn.add_style_class_name('rumo-bar-action-btn-active');
+    } else {
+      this._displayModeIcon.gicon = this._overlayIcon;
+      this._displayModeLabel.text = _('Overlay');
+      this._displayModeBtn.remove_style_class_name('rumo-bar-action-btn-active');
+    }
+  }
+
+  private _syncToolbarVisibility(): void {
+    if (this._symbolMode) {
+      this._toolbarOpen = false;
+      this._toolbarToggleBtn.hide();
+      this._toolbarToggleBtn.remove_style_class_name('rumo-bar-action-btn-active');
+      this._toolbarBox.hide();
+      this._candidateList.hide();
+      this._symbolTabsBox.show();
+      this._expandBtn.hide();
+      return;
+    }
+
+    this._symbolTabsBox.hide();
+    this._expandBtn.show();
+
+    if (this._hasCandidates) {
+      this._toolbarOpen = false;
+      this._toolbarToggleBtn.hide();
+      this._toolbarToggleBtn.remove_style_class_name('rumo-bar-action-btn-active');
+      this._toolbarBox.hide();
+      this._candidateList.show();
+      return;
+    }
+
+    this._toolbarToggleBtn.show();
+    if (this._toolbarOpen) {
+      this._toolbarToggleIcon.gicon = this._chevronLeftIcon;
+      this._toolbarToggleBtn.add_style_class_name('rumo-bar-action-btn-active');
+      this._toolbarBox.show();
+      this._candidateList.hide();
+    } else {
+      this._toolbarToggleIcon.gicon = this._chevronRightIcon;
+      this._toolbarToggleBtn.remove_style_class_name('rumo-bar-action-btn-active');
+      this._toolbarBox.hide();
+      this._candidateList.show();
+    }
   }
 
   private _syncExpandBtn(): void {

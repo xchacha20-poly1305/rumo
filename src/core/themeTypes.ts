@@ -112,6 +112,7 @@ export interface AppliedThemeState {
   mode: ThemeMode;
   keyBorder: boolean;
   hasBackgroundImage: boolean;
+  fontScale: number;
 }
 
 export interface ThemeLayerInput {

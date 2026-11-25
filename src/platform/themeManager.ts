@@ -112,6 +112,7 @@ export class ThemeManager {
       mode: result.theme.mode,
       keyBorder: result.theme.geometry.keyBorder,
       hasBackgroundImage: result.theme.background.imageUri !== null,
+      fontScale: result.theme.typography.fontScale,
     });
   }
 

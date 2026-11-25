@@ -56,6 +56,7 @@ export class KeyButton {
       reactive: true,
       x_expand: true,
       y_expand: true,
+      y_align: Clutter.ActorAlign.FILL,
     };
 
     if (spec.icon) {

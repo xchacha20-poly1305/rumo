@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 22:08+0800\n"
+"POT-Creation-Date: 2026-11-25 09:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:6
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:6 src/prefs.ts:143
 msgid "Enable XWayland clipboard paste fallback"
 msgstr ""
 
@@ -28,35 +28,100 @@ msgid ""
 "contents."
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:11
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:15
+msgid "Keyboard display mode"
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:16
+msgid ""
+"How the on-screen keyboard interacts with open windows: overlay on top or "
+"push windows upward."
+msgstr ""
+
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:21
 msgid "Keyboard height ratio relative to monitor height"
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:12
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:22
 msgid ""
 "Height of the on-screen keyboard as a fraction of the active monitor height."
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:16
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:26 src/prefs.ts:131
 msgid "Show top bar toggle indicator"
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:17
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:27 src/prefs.ts:132
 msgid "Show a keyboard toggle button in the GNOME Shell top bar."
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:21
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:31
 msgid "Recently used symbols"
 msgstr ""
 
-#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:22
+#: schemas/org.gnome.shell.extensions.rumo.gschema.xml:32
 msgid ""
 "Ordered list of recently used symbols in the symbol picker (most recent "
 "first)."
 msgstr ""
 
-#: src/platform/oskManager.ts:165
+#: src/platform/oskManager.ts:188
 msgid "Rumo Keyboard"
+msgstr ""
+
+#: src/prefs.ts:24
+msgid "General"
+msgstr ""
+
+#: src/prefs.ts:29
+msgid "Display & Layout"
+msgstr ""
+
+#: src/prefs.ts:33
+msgid "Overlay on top"
+msgstr ""
+
+#: src/prefs.ts:34
+msgid "Push screen up"
+msgstr ""
+
+#: src/prefs.ts:37
+msgid "Display mode"
+msgstr ""
+
+#: src/prefs.ts:39
+msgid ""
+"Choose whether the keyboard floats over windows or pushes windows upward."
+msgstr ""
+
+#: src/prefs.ts:70
+msgid "Keyboard height"
+msgstr ""
+
+#: src/prefs.ts:71
+msgid "Height of the keyboard as a percentage of the screen height."
+msgstr ""
+
+#: src/prefs.ts:127
+msgid "Integration"
+msgstr ""
+
+#: src/prefs.ts:145
+msgid ""
+"Temporarily paste via clipboard when a window lacks native text-input "
+"support."
+msgstr ""
+
+#: src/ui/candidateBar.ts:118 src/ui/candidateBar.ts:414
+msgid "Overlay"
+msgstr ""
+
+#: src/ui/candidateBar.ts:148
+msgid "Settings"
+msgstr ""
+
+#: src/ui/candidateBar.ts:410
+msgid "Push screen"
 msgstr ""
 
 #: src/ui/candidateDrawer.ts:182
@@ -71,6 +136,6 @@ msgstr ""
 msgid "Space"
 msgstr ""
 
-#: src/ui/symbolPickerView.ts:253
+#: src/ui/symbolPickerView.ts:260
 msgid "No recently used symbols"
 msgstr ""

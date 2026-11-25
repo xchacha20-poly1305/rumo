@@ -11,7 +11,7 @@ const outDir = join(rootDir, 'dist', UUID);
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
-const result = await Bun.build({
+const extResult = await Bun.build({
   entrypoints: [join(rootDir, 'src', 'extension.ts')],
   outdir: outDir,
   naming: 'extension.js',
@@ -23,8 +23,27 @@ const result = await Bun.build({
   banner: '// Rumo (如梦输入法) — Compiled from TypeScript for GNOME Shell GJS ESM',
 });
 
-if (!result.success) {
-  for (const log of result.logs) {
+if (!extResult.success) {
+  for (const log of extResult.logs) {
+    console.error(log);
+  }
+  process.exit(1);
+}
+
+const prefsResult = await Bun.build({
+  entrypoints: [join(rootDir, 'src', 'prefs.ts')],
+  outdir: outDir,
+  naming: 'prefs.js',
+  format: 'esm',
+  target: 'browser',
+  external: ['gi://*', 'resource://*'],
+  minify: false,
+  sourcemap: 'none',
+  banner: '// Rumo Preferences — Compiled from TypeScript for GNOME Extensions GTK4/Adw',
+});
+
+if (!prefsResult.success) {
+  for (const log of prefsResult.logs) {
     console.error(log);
   }
   process.exit(1);

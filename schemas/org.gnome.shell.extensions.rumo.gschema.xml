@@ -6,8 +6,18 @@
       <summary>Enable XWayland clipboard paste fallback</summary>
       <description>When the focused window has no Wayland text-input context and non-ASCII text is committed, temporarily paste via clipboard and restore previous clipboard contents.</description>
     </key>
+    <key name="display-mode" type="s">
+      <choices>
+        <choice value="overlay"/>
+        <choice value="push"/>
+      </choices>
+      <default>'overlay'</default>
+      <summary>Keyboard display mode</summary>
+      <description>How the on-screen keyboard interacts with open windows: overlay on top or push windows upward.</description>
+    </key>
     <key name="keyboard-height-ratio" type="d">
-      <default>0.34</default>
+      <range min="0.25" max="0.65"/>
+      <default>0.42</default>
       <summary>Keyboard height ratio relative to monitor height</summary>
       <description>Height of the on-screen keyboard as a fraction of the active monitor height.</description>
     </key>

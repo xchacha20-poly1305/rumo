@@ -1,7 +1,10 @@
 import Clutter from 'gi://Clutter';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { getLayout } from '../core/layouts.js';
+import { computeKeyboardLayoutMetrics } from '../core/layoutMetrics.js';
+import type { DisplayMode } from '../core/settings.js';
 import type { AppliedThemeState } from '../core/themeTypes.js';
 import type {
   CandidateDrawerState,
@@ -28,13 +31,17 @@ export interface KeyboardViewCallbacks {
   onSelectSymbolCategory(index: number): void;
   onSymbolPrevPage(): void;
   onSymbolNextPage(): void;
+  onToggleDisplayMode(): void;
+  onOpenSettings(): void;
   onHide(): void;
 }
 
 export class KeyboardView {
   readonly actor: any;
+  readonly preeditActor: any;
   private readonly _bgLayer: any;
   private readonly _contentBox: any;
+  private readonly _preeditLabel: any;
   private readonly _candidateBar: CandidateBar;
   private readonly _candidateDrawer: CandidateDrawer;
   private readonly _symbolPickerView: SymbolPickerView;
@@ -47,6 +54,13 @@ export class KeyboardView {
   private _imLabel = '中';
   private _width = 1024;
   private _height = 320;
+  private _fontScale = 1;
+  private _monitorX = 0;
+  private _monitorY = 0;
+  private _monitorWidth = 1024;
+  private _monitorHeight = 768;
+  private _preeditText = '';
+  private _isVisible = false;
   private _buttons: KeyButton[] = [];
   private _drawerOpen = false;
   private _symbolPickerState: SymbolPickerState | null = null;
@@ -64,6 +78,23 @@ export class KeyboardView {
       x_expand: true,
       y_expand: true,
     });
+
+    this.preeditActor = new St.BoxLayout({
+      style_class: 'rumo-preedit-strip',
+      reactive: false,
+      can_focus: false,
+      visible: false,
+    });
+    this._preeditLabel = new St.Label({
+      style_class: 'rumo-preedit-label',
+      text: '',
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    const preeditClutterText = this._preeditLabel.get_clutter_text?.();
+    if (preeditClutterText) {
+      preeditClutterText.ellipsize = Pango.EllipsizeMode.START;
+    }
+    this.preeditActor.add_child(this._preeditLabel);
 
     this._bgLayer = new St.Widget({
       style_class: 'rumo-keyboard-bg',
@@ -96,6 +127,8 @@ export class KeyboardView {
         onSelectSymbolCategory: (idx) => this._callbacks.onSelectSymbolCategory(idx),
         onSymbolPrevPage: () => this._callbacks.onSymbolPrevPage(),
         onSymbolNextPage: () => this._callbacks.onSymbolNextPage(),
+        onToggleDisplayMode: () => this._callbacks.onToggleDisplayMode(),
+        onOpenSettings: () => this._callbacks.onOpenSettings(),
         onHide: () => this._callbacks.onHide(),
       },
       extensionPath,
@@ -137,9 +170,13 @@ export class KeyboardView {
     if (state.mode === 'dark') {
       this.actor.add_style_class_name('rumo-mode-dark');
       this.actor.remove_style_class_name('rumo-mode-light');
+      this.preeditActor.add_style_class_name('rumo-mode-dark');
+      this.preeditActor.remove_style_class_name('rumo-mode-light');
     } else {
       this.actor.add_style_class_name('rumo-mode-light');
       this.actor.remove_style_class_name('rumo-mode-dark');
+      this.preeditActor.add_style_class_name('rumo-mode-light');
+      this.preeditActor.remove_style_class_name('rumo-mode-dark');
     }
 
     if (state.keyBorder) {
@@ -155,6 +192,22 @@ export class KeyboardView {
       this.actor.remove_style_class_name('rumo-has-bg-image');
       this._bgLayer.hide();
     }
+
+    this._fontScale = Number.isFinite(state.fontScale) ? state.fontScale : 1;
+    this._symbolPickerView.setFontScale(this._fontScale);
+    this._applyLayoutMetrics();
+  }
+
+  setDisplayMode(mode: DisplayMode): void {
+    this._candidateBar.setDisplayMode(mode);
+  }
+
+  setKeyboardVisible(visible: boolean): void {
+    this._isVisible = visible;
+    if (!visible) {
+      this._candidateBar.collapseToolbar();
+    }
+    this._syncPreeditVisibility();
   }
 
   setDimensions(width: number, height: number): void {
@@ -163,7 +216,22 @@ export class KeyboardView {
     this.actor.set_size(width, height);
     this._candidateDrawer.setContainerWidth(width);
     this._symbolPickerView.setDimensions(width, height);
-    this._applyKeySizes();
+    this._applyLayoutMetrics();
+  }
+
+  setMonitorBounds(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    kbHeight: number,
+  ): void {
+    this._monitorX = x;
+    this._monitorY = y;
+    this._monitorWidth = width;
+    this._monitorHeight = height;
+    this._height = kbHeight;
+    this._updatePreeditGeometry();
   }
 
   renderLayout(layoutId: LayoutId, shiftState: ShiftState): void {
@@ -181,6 +249,7 @@ export class KeyboardView {
         true,
         this._symbolPickerState ?? undefined,
       );
+      this._syncPreeditVisibility();
       return;
     }
 
@@ -198,7 +267,7 @@ export class KeyboardView {
       const rowBox = new St.BoxLayout({
         style_class: 'rumo-key-row',
         x_expand: true,
-        y_expand: true,
+        y_expand: false,
         x_align: Clutter.ActorAlign.FILL,
         can_focus: false,
       });
@@ -234,6 +303,7 @@ export class KeyboardView {
     }
 
     this._applyKeySizes();
+    this._syncPreeditVisibility();
   }
 
   updateSymbolPickerState(state: SymbolPickerState): void {
@@ -243,6 +313,9 @@ export class KeyboardView {
   }
 
   updateUIState(state: ClientSideUIState): void {
+    this._preeditText = state.preeditText;
+    this._preeditLabel.text = state.preeditText;
+    this._syncPreeditVisibility();
     this._candidateBar.updateUI(state);
   }
 
@@ -277,18 +350,66 @@ export class KeyboardView {
     }
   }
 
+  private _syncPreeditVisibility(): void {
+    if (
+      this._isVisible &&
+      this._currentLayout !== 'symbol-picker' &&
+      this._preeditText.length > 0
+    ) {
+      this._updatePreeditGeometry();
+      this.preeditActor.show();
+    } else {
+      this.preeditActor.hide();
+    }
+  }
+
+  private _updatePreeditGeometry(): void {
+    const metrics = computeKeyboardLayoutMetrics(this._height, this._fontScale, 4);
+    const maxWidth = Math.max(120, this._monitorWidth - 24);
+    this.preeditActor.set_style(`max-width: ${maxWidth}px;`);
+    this.preeditActor.set_height(metrics.preeditHeight);
+    const preeditX = this._monitorX + 12;
+    const preeditY = Math.max(
+      this._monitorY,
+      this._monitorY + this._monitorHeight - this._height - metrics.preeditHeight,
+    );
+    this.preeditActor.set_position(preeditX, preeditY);
+  }
+
+  private _applyLayoutMetrics(): void {
+    const metrics = computeKeyboardLayoutMetrics(this._height, this._fontScale, 4);
+    this._candidateBar.setBarHeights(
+      metrics.candidateBarHeight,
+      metrics.candidateRowHeight,
+    );
+    this._updatePreeditGeometry();
+    this._applyKeySizes();
+  }
+
   private _applyKeySizes(): void {
     if (this._currentLayout === 'symbol-picker') {
       return;
     }
 
     const layout = getLayout(this._currentLayout);
+    const metrics = computeKeyboardLayoutMetrics(
+      this._height,
+      this._fontScale,
+      layout.rows.length,
+    );
+    this._candidateBar.setBarHeights(
+      metrics.candidateBarHeight,
+      metrics.candidateRowHeight,
+    );
+
     const usableWidth = Math.max(320, this._width - 28);
     const rows = this._keyGrid.get_children();
 
     rows.forEach((rowActor: any, rowIdx: number) => {
       const rowSpecs = layout.rows[rowIdx];
       if (!rowSpecs) return;
+
+      rowActor.set_height(metrics.rowHeight);
 
       let totalWeight = 0;
       for (const spec of rowSpecs) {
@@ -301,7 +422,10 @@ export class KeyboardView {
       const children = rowActor.get_children();
       children.forEach((child: any, colIdx: number) => {
         const weight = rowSpecs[colIdx]?.width ?? 1;
-        child.set_width(Math.max(28, Math.floor(unitWidth * weight)));
+        child.set_size(
+          Math.max(28, Math.floor(unitWidth * weight)),
+          metrics.rowHeight,
+        );
       });
     });
   }
@@ -310,6 +434,7 @@ export class KeyboardView {
     this._candidateBar.destroy();
     this._candidateDrawer.destroy();
     this._symbolPickerView.destroy();
+    this.preeditActor.destroy();
     this.actor.destroy();
   }
 }

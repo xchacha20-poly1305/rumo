@@ -1,3 +1,8 @@
+declare module 'gi://Adw' {
+  const Adw: any;
+  export default Adw;
+}
+
 declare module 'gi://Clutter' {
   const Clutter: any;
   export default Clutter;
@@ -16,6 +21,11 @@ declare module 'gi://GLib' {
 declare module 'gi://GObject' {
   const GObject: any;
   export default GObject;
+}
+
+declare module 'gi://Gtk' {
+  const Gtk: any;
+  export default Gtk;
 }
 
 declare module 'gi://Graphene' {
@@ -45,8 +55,22 @@ declare module 'resource:///org/gnome/shell/extensions/extension.js' {
     path: string;
     metadata: any;
     getSettings(schema?: string): any;
+    openPreferences(): void;
     enable(): void;
     disable(): void;
+  }
+  export function gettext(msgid: string): string;
+  export function ngettext(msgid: string, msgidPlural: string, n: number): string;
+  export function pgettext(context: string, msgid: string): string;
+}
+
+declare module 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js' {
+  export class ExtensionPreferences {
+    uuid: string;
+    path: string;
+    metadata: any;
+    getSettings(schema?: string): any;
+    fillPreferencesWindow(window: any): Promise<void> | void;
   }
   export function gettext(msgid: string): string;
   export function ngettext(msgid: string, msgidPlural: string, n: number): string;
@@ -57,6 +81,7 @@ declare module 'resource:///org/gnome/shell/ui/main.js' {
   export const keyboard: any;
   export const inputMethod: any;
   export const layoutManager: any;
+  export const overview: any;
   export const panel: any;
 }
 

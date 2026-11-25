@@ -1,6 +1,7 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { InputRouter } from './core/inputRouter.js';
+import { clampHeightRatio, normalizeDisplayMode } from './core/settings.js';
 import { Fcitx5Client } from './platform/fcitx5Client.js';
 import { FocusTracker } from './platform/focusTracker.js';
 import { OskManager } from './platform/oskManager.js';
@@ -25,7 +26,12 @@ export default class RumoExtension extends Extension {
     const clipboardFallback = this._settings.get_boolean(
       'xwayland-clipboard-fallback',
     );
-    const heightRatio = this._settings.get_double('keyboard-height-ratio');
+    const displayMode = normalizeDisplayMode(
+      this._settings.get_string('display-mode'),
+    );
+    const heightRatio = clampHeightRatio(
+      this._settings.get_double('keyboard-height-ratio'),
+    );
     const showIndicator = this._settings.get_boolean('show-panel-indicator');
     const initialRecentSymbols = this._settings.get_strv('recent-symbols');
 
@@ -35,7 +41,7 @@ export default class RumoExtension extends Extension {
 
     this._focusTracker = new FocusTracker(() => {
       routerRef?.onFocusWindowChanged();
-    });
+    }, displayMode);
 
     this._fcitx = new Fcitx5Client({
       onConnectionChanged: (connected) => routerRef?.onFcitxConnectionChanged(connected),
@@ -64,10 +70,22 @@ export default class RumoExtension extends Extension {
         onSelectSymbolCategory: (idx) => routerRef?.selectSymbolCategory(idx),
         onSymbolPrevPage: () => routerRef?.prevSymbolPage(),
         onSymbolNextPage: () => routerRef?.nextSymbolPage(),
+        onToggleDisplayMode: () => {
+          if (!this._settings) return;
+          const current = normalizeDisplayMode(
+            this._settings.get_string('display-mode'),
+          );
+          const next = current === 'overlay' ? 'push' : 'overlay';
+          this._settings.set_string('display-mode', next);
+        },
+        onOpenSettings: () => {
+          this.openPreferences();
+        },
         onHide: () => this._oskManager?.close(),
       },
       this.path,
     );
+    this._view.setDisplayMode(displayMode);
 
     this._themeManager = new ThemeManager({
       onThemeApplied: (state) => this._view?.applyThemeState(state),
@@ -102,9 +120,17 @@ export default class RumoExtension extends Extension {
       },
       heightRatio,
       showIndicator,
+      displayMode,
     );
 
     this._settingsSignalIds.push(
+      this._settings.connect('changed::display-mode', () => {
+        const mode = normalizeDisplayMode(
+          this._settings.get_string('display-mode'),
+        );
+        this._view?.setDisplayMode(mode);
+        this._oskManager?.setDisplayMode(mode);
+      }),
       this._settings.connect('changed::xwayland-clipboard-fallback', () => {
         this._injector?.setClipboardFallbackEnabled(
           this._settings.get_boolean('xwayland-clipboard-fallback'),

@@ -17,13 +17,17 @@
 }
 
 .rumo-candidate-bar {
-  spacing: 4px;
   padding: 0 2px 4px 2px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .rumo-preedit-strip {
-  padding: 0 8px;
+  background-color: rgba(24, 25, 29, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0 10px;
+  height: 28px;
   spacing: 6px;
 }
 
@@ -36,7 +40,9 @@
 
 .rumo-candidate-row {
   spacing: 8px;
+  height: 40px;
   min-height: 40px;
+  max-height: 40px;
 }
 
 .rumo-candidate-list {
@@ -54,8 +60,9 @@
   background-color: transparent;
   color: #f2f4f8;
   border-radius: 8px;
-  padding: 4px 10px;
+  padding: 2px 10px;
   min-height: 36px;
+  height: 36px;
   font-size: 18px;
   font-weight: 500;
   transition-duration: 80ms;
@@ -82,9 +89,10 @@
   background-color: rgba(255, 255, 255, 0.08);
   color: #e8ebf2;
   border-radius: 9px;
-  padding: 4px 12px;
-  min-width: 44px;
+  padding: 2px 10px;
+  min-width: 40px;
   min-height: 36px;
+  height: 36px;
   font-size: 18px;
   font-weight: 600;
   transition-duration: 80ms;
@@ -103,6 +111,35 @@
 .rumo-bar-action-btn:insensitive {
   color: rgba(255, 255, 255, 0.22);
   background-color: rgba(255, 255, 255, 0.03);
+}
+
+.rumo-toolbar-box {
+  spacing: 6px;
+  padding: 0 2px;
+}
+
+.rumo-toolbar-toggle-btn {
+  min-width: 34px;
+  padding: 2px 6px;
+}
+
+.rumo-toolbar-btn {
+  padding: 2px 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rumo-toolbar-btn-content {
+  spacing: 6px;
+}
+
+.rumo-toolbar-icon {
+  icon-size: 18px;
+}
+
+.rumo-toolbar-label {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .rumo-hide-icon {
@@ -305,8 +342,9 @@
   background-color: transparent;
   color: rgba(232, 235, 242, 0.55);
   border-radius: 8px;
-  padding: 4px 6px;
-  min-height: 34px;
+  padding: 2px 6px;
+  min-height: 36px;
+  height: 36px;
   font-size: 14px;
   font-weight: 600;
   transition-duration: 70ms;

@@ -1,3 +1,4 @@
+import { computeKeyboardLayoutMetrics } from './layoutMetrics.js';
 import { formatRgba, isSafeCssUri } from './themeColor.js';
 import type { ResolvedTheme } from './themeTypes.js';
 
@@ -10,6 +11,10 @@ export function compileThemeCss(theme: ResolvedTheme): string {
   const { colors: c, geometry, typography, background } = theme;
   const s = typography.fontScale;
   const rgba = formatRgba;
+  const metrics = computeKeyboardLayoutMetrics(0, s);
+  const candRowHeight = metrics.candidateRowHeight;
+  const candBtnHeight = metrics.candidateButtonHeight;
+  const preeditHeight = metrics.preeditHeight;
 
   const fontDecl = typography.fontFamily
     ? `\n  font-family: ${typography.fontFamily};`
@@ -54,14 +59,18 @@ ${bgLayerRule}
 
 .rumo-candidate-bar {
   background-color: ${rgba(c.candidateBarBackground)};
-  spacing: 4px;
   padding: 0 2px 4px 2px;
   border-bottom: 1px solid ${rgba(c.divider)};
 }
 
 .rumo-preedit-strip {
-  padding: 0 8px;
-  spacing: 6px;
+  background-color: ${rgba(c.keyboardBackground)};
+  border: 1px solid ${rgba(c.keyboardBorder)};
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0 10px;
+  height: ${preeditHeight}px;
+  spacing: 6px;${fontDecl}
 }
 
 .rumo-preedit-label {
@@ -73,7 +82,9 @@ ${bgLayerRule}
 
 .rumo-candidate-row {
   spacing: 8px;
-  min-height: 40px;
+  height: ${candRowHeight}px;
+  min-height: ${candRowHeight}px;
+  max-height: ${candRowHeight}px;
 }
 
 .rumo-candidate-list {
@@ -91,8 +102,9 @@ ${bgLayerRule}
   background-color: transparent;
   color: ${rgba(c.candidateForeground)};
   border-radius: 8px;
-  padding: 4px 10px;
-  min-height: 36px;
+  padding: 2px 10px;
+  min-height: ${candBtnHeight}px;
+  height: ${candBtnHeight}px;
   font-size: ${scaledPx(18, s)};
   font-weight: 500;
   transition-duration: 80ms;
@@ -124,9 +136,10 @@ ${bgLayerRule}
   background-color: ${rgba(c.barActionBackground)};
   color: ${rgba(c.barActionForeground)};
   border-radius: 9px;
-  padding: 4px 12px;
-  min-width: 44px;
-  min-height: 36px;
+  padding: 2px 10px;
+  min-width: 40px;
+  min-height: ${candBtnHeight}px;
+  height: ${candBtnHeight}px;
   font-size: ${scaledPx(18, s)};
   font-weight: 600;
   transition-duration: 80ms;
@@ -145,6 +158,35 @@ ${bgLayerRule}
 .rumo-bar-action-btn:insensitive {
   color: ${rgba(c.barActionDisabledForeground)};
   background-color: ${rgba(c.barActionDisabledBackground)};
+}
+
+.rumo-toolbar-box {
+  spacing: 6px;
+  padding: 0 2px;
+}
+
+.rumo-toolbar-toggle-btn {
+  min-width: 34px;
+  padding: 2px 6px;
+}
+
+.rumo-toolbar-btn {
+  padding: 2px 10px;
+  font-size: ${scaledPx(14, s)};
+  font-weight: 600;
+}
+
+.rumo-toolbar-btn-content {
+  spacing: 6px;
+}
+
+.rumo-toolbar-icon {
+  icon-size: ${scaledPx(18, s)};
+}
+
+.rumo-toolbar-label {
+  font-size: ${scaledPx(14, s)};
+  font-weight: 600;
 }
 
 .rumo-hide-icon {
@@ -370,8 +412,9 @@ ${bgLayerRule}
   background-color: transparent;
   color: ${rgba(c.symbolTabForeground)};
   border-radius: 8px;
-  padding: 4px 6px;
-  min-height: 34px;
+  padding: 2px 6px;
+  min-height: ${candBtnHeight}px;
+  height: ${candBtnHeight}px;
   font-size: ${scaledPx(14, s)};
   font-weight: 600;
   transition-duration: 70ms;

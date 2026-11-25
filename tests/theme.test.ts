@@ -262,5 +262,13 @@ describe('compileThemeCss', () => {
     expect(css).toContain('icon-size: 24px;'); // 20 * 1.2
     expect(css).toContain('font-size: 21.6px;'); // 18 * 1.2
     expect(css).toContain('.rumo-hide-icon');
+    expect(css).toContain('border-radius: 8px 8px 0 0;');
+    expect(css).toContain('height: 34px;'); // round(28 * 1.2)
+    expect(css).toContain('height: 48px;'); // round(40 * 1.2)
+    expect(css).toContain('min-height: 48px;');
+    expect(css).toContain('max-height: 48px;');
+    expect(css).toContain('.rumo-toolbar-btn');
+    expect(css).toContain('.rumo-toolbar-toggle-btn');
+    expect(css).toContain('.rumo-toolbar-icon');
   });
 });

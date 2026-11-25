@@ -6,6 +6,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+import { clampHeightRatio, type DisplayMode } from '../core/settings.js';
 import type { InputPurposeKind } from '../core/types.js';
 import type { FocusTracker } from './focusTracker.js';
 import type { KeyboardView } from '../ui/keyboardView.js';
@@ -45,6 +46,7 @@ export class OskManager {
   private _panelStateId = 0;
   private _purposeChangedId = 0;
   private _a11yChangedId = 0;
+  private _monitorsChangedId = 0;
 
   private _origKeyboardOpen: any = null;
   private _origKeyboardClose: any = null;
@@ -56,9 +58,11 @@ export class OskManager {
     private readonly _callbacks: OskManagerCallbacks,
     heightRatio: number,
     showPanelIndicator: boolean,
+    displayMode: DisplayMode,
   ) {
-    this._heightRatio = heightRatio;
+    this._heightRatio = clampHeightRatio(heightRatio);
     this._a11ySettings = new Gio.Settings({ schema_id: A11Y_APPLICATIONS_SCHEMA });
+    this._focusTracker.setDisplayMode(displayMode, false);
 
     this._installHooks();
     this._mountView();
@@ -74,10 +78,15 @@ export class OskManager {
   }
 
   setHeightRatio(ratio: number): void {
-    this._heightRatio = Math.min(0.55, Math.max(0.22, ratio));
+    this._heightRatio = clampHeightRatio(ratio);
     if (this._visible) {
-      this._applyGeometry();
+      const kbHeight = this._applyGeometry();
+      this._focusTracker.setKeyboardState(true, kbHeight, false);
     }
+  }
+
+  setDisplayMode(mode: DisplayMode): void {
+    this._focusTracker.setDisplayMode(mode, true);
   }
 
   setShowPanelIndicator(show: boolean): void {
@@ -119,6 +128,13 @@ export class OskManager {
     kbBox.add_child(this._view.actor);
     this._view.actor.hide();
     kbBox.hide();
+
+    const preeditParent =
+      global.compositor?.get_input_panel_group?.() ?? Main.layoutManager.uiGroup;
+    if (preeditParent) {
+      preeditParent.add_child(this._view.preeditActor);
+    }
+    this._view.preeditActor.hide();
   }
 
   private _connectSignals(): void {
@@ -155,6 +171,13 @@ export class OskManager {
       },
     );
 
+    this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => {
+      if (this._visible) {
+        const kbHeight = this._applyGeometry();
+        this._focusTracker.setKeyboardState(true, kbHeight, false);
+      }
+    });
+
     // Sync initial purpose
     this._callbacks.onPurposeChanged(
       mapClutterPurpose(Main.inputMethod.content_purpose ?? 0),
@@ -187,6 +210,13 @@ export class OskManager {
     kbBox.set_position(monitor.x, monitor.y + monitor.height - kbHeight);
     kbBox.set_size(monitor.width, kbHeight);
     this._view.setDimensions(monitor.width, kbHeight);
+    this._view.setMonitorBounds(
+      monitor.x,
+      monitor.y,
+      monitor.width,
+      monitor.height,
+      kbHeight,
+    );
     return kbHeight;
   }
 
@@ -206,7 +236,8 @@ export class OskManager {
       mode: Clutter.AnimationMode.EASE_OUT_QUAD,
     });
 
-    this._focusTracker.setKeyboardState(true, kbHeight);
+    this._view.setKeyboardVisible(true);
+    this._focusTracker.setKeyboardState(true, kbHeight, true);
     this._callbacks.onOpened();
   }
 
@@ -217,7 +248,8 @@ export class OskManager {
     const kbBox = Main.layoutManager.keyboardBox;
     const kbHeight = kbBox.height || 300;
 
-    this._focusTracker.setKeyboardState(false, 0);
+    this._view.setKeyboardVisible(false);
+    this._focusTracker.setKeyboardState(false, 0, true);
     this._callbacks.onClosed();
 
     kbBox.ease({
@@ -245,7 +277,8 @@ export class OskManager {
   destroy(): void {
     if (this._visible) {
       this._visible = false;
-      this._focusTracker.setKeyboardState(false, 0);
+      this._view.setKeyboardVisible(false);
+      this._focusTracker.setKeyboardState(false, 0, false);
     }
 
     if (this._panelStateId) {
@@ -260,10 +293,19 @@ export class OskManager {
       this._a11ySettings.disconnect(this._a11yChangedId);
       this._a11yChangedId = 0;
     }
+    if (this._monitorsChangedId) {
+      Main.layoutManager.disconnect(this._monitorsChangedId);
+      this._monitorsChangedId = 0;
+    }
 
     if (this._panelButton) {
       this._panelButton.destroy();
       this._panelButton = null;
+    }
+
+    const preeditParent = this._view.preeditActor.get_parent?.();
+    if (preeditParent) {
+      preeditParent.remove_child(this._view.preeditActor);
     }
 
     const kbBox = Main.layoutManager.keyboardBox;
